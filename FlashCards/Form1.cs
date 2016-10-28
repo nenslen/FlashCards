@@ -13,5 +13,10 @@ namespace FlashCards {
         public frmFlashCards() {
             InitializeComponent();
         }
+
+        private void btnNewFolder_Click(object sender, EventArgs e) {
+            tvDecks.Nodes.Add("papa");
+            tvDecks.Nodes[0].Nodes.Add("mama");
+        }
     }
 }
