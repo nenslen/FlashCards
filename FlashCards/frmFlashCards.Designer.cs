@@ -23,12 +23,14 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.btnTest = new System.Windows.Forms.Button();
             this.tvDecks = new System.Windows.Forms.TreeView();
             this.btnNewDeck = new System.Windows.Forms.Button();
             this.btnNewFolder = new System.Windows.Forms.Button();
             this.pnlNewFolder = new System.Windows.Forms.Panel();
+            this.btnCancelNewFolder = new System.Windows.Forms.Button();
             this.btnCreateNewFolder = new System.Windows.Forms.Button();
             this.txtFolderName = new System.Windows.Forms.TextBox();
             this.lblFolderName = new System.Windows.Forms.Label();
@@ -61,12 +63,18 @@
             this.lblNewCard = new System.Windows.Forms.Label();
             this.lblCardQText = new System.Windows.Forms.Label();
             this.pnlCardQuestion = new System.Windows.Forms.Panel();
+            this.rtbViewCardQuestionText = new System.Windows.Forms.RichTextBox();
             this.btnShowAnswer = new System.Windows.Forms.Button();
             this.pbCardQuestion = new System.Windows.Forms.PictureBox();
-            this.lblViewCardQText = new System.Windows.Forms.Label();
+            this.lblViewCardQ = new System.Windows.Forms.Label();
             this.lblViewDeckQuestion = new System.Windows.Forms.Label();
             this.pnlCardAnswer = new System.Windows.Forms.Panel();
+            this.lblViewCardAnswer = new System.Windows.Forms.Label();
+            this.lblViewCardQuestion2 = new System.Windows.Forms.Label();
+            this.rtbViewCardAnswer = new System.Windows.Forms.RichTextBox();
+            this.rtbViewCardQuestion = new System.Windows.Forms.RichTextBox();
             this.gbSkill = new System.Windows.Forms.GroupBox();
+            this.btnFinishDeck = new System.Windows.Forms.Button();
             this.rb5 = new System.Windows.Forms.RadioButton();
             this.btnCardAnswerNext = new System.Windows.Forms.Button();
             this.rb4 = new System.Windows.Forms.RadioButton();
@@ -74,10 +82,12 @@
             this.rb2 = new System.Windows.Forms.RadioButton();
             this.rb1 = new System.Windows.Forms.RadioButton();
             this.pbCardAnswer = new System.Windows.Forms.PictureBox();
-            this.lblViewCardAText = new System.Windows.Forms.Label();
             this.lblViewDeckAnswer = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.btnFinishDeck = new System.Windows.Forms.Button();
+            this.cmsTreeView = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.pnlMain.SuspendLayout();
             this.pnlNewFolder.SuspendLayout();
             this.pnlNewDeck.SuspendLayout();
@@ -87,6 +97,8 @@
             this.pnlCardAnswer.SuspendLayout();
             this.gbSkill.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).BeginInit();
+            this.cmsTreeView.SuspendLayout();
+            this.toolStripContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlMain
@@ -119,6 +131,7 @@
             this.tvDecks.Name = "tvDecks";
             this.tvDecks.Size = new System.Drawing.Size(385, 227);
             this.tvDecks.TabIndex = 3;
+            this.tvDecks.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvDecks_NodeMouseClick);
             this.tvDecks.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvDecks_NodeMouseDoubleClick);
             // 
             // btnNewDeck
@@ -143,7 +156,7 @@
             // 
             // pnlNewFolder
             // 
-            this.pnlNewFolder.Controls.Add(this.button1);
+            this.pnlNewFolder.Controls.Add(this.btnCancelNewFolder);
             this.pnlNewFolder.Controls.Add(this.btnCreateNewFolder);
             this.pnlNewFolder.Controls.Add(this.txtFolderName);
             this.pnlNewFolder.Controls.Add(this.lblFolderName);
@@ -152,6 +165,17 @@
             this.pnlNewFolder.Name = "pnlNewFolder";
             this.pnlNewFolder.Size = new System.Drawing.Size(368, 277);
             this.pnlNewFolder.TabIndex = 1;
+            // 
+            // btnCancelNewFolder
+            // 
+            this.btnCancelNewFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancelNewFolder.Location = new System.Drawing.Point(171, 236);
+            this.btnCancelNewFolder.Name = "btnCancelNewFolder";
+            this.btnCancelNewFolder.Size = new System.Drawing.Size(94, 38);
+            this.btnCancelNewFolder.TabIndex = 11;
+            this.btnCancelNewFolder.Text = "Cancel";
+            this.btnCancelNewFolder.UseVisualStyleBackColor = true;
+            this.btnCancelNewFolder.Click += new System.EventHandler(this.btnCancelNewFolder_Click);
             // 
             // btnCreateNewFolder
             // 
@@ -491,19 +515,33 @@
             // 
             // pnlCardQuestion
             // 
+            this.pnlCardQuestion.Controls.Add(this.rtbViewCardQuestionText);
             this.pnlCardQuestion.Controls.Add(this.btnShowAnswer);
             this.pnlCardQuestion.Controls.Add(this.pbCardQuestion);
-            this.pnlCardQuestion.Controls.Add(this.lblViewCardQText);
+            this.pnlCardQuestion.Controls.Add(this.lblViewCardQ);
             this.pnlCardQuestion.Controls.Add(this.lblViewDeckQuestion);
-            this.pnlCardQuestion.Location = new System.Drawing.Point(1586, 518);
+            this.pnlCardQuestion.Location = new System.Drawing.Point(64, 355);
             this.pnlCardQuestion.Name = "pnlCardQuestion";
-            this.pnlCardQuestion.Size = new System.Drawing.Size(350, 412);
+            this.pnlCardQuestion.Size = new System.Drawing.Size(529, 416);
             this.pnlCardQuestion.TabIndex = 8;
+            // 
+            // rtbViewCardQuestionText
+            // 
+            this.rtbViewCardQuestionText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbViewCardQuestionText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbViewCardQuestionText.Location = new System.Drawing.Point(8, 72);
+            this.rtbViewCardQuestionText.Name = "rtbViewCardQuestionText";
+            this.rtbViewCardQuestionText.ReadOnly = true;
+            this.rtbViewCardQuestionText.Size = new System.Drawing.Size(509, 293);
+            this.rtbViewCardQuestionText.TabIndex = 24;
+            this.rtbViewCardQuestionText.Text = "";
             // 
             // btnShowAnswer
             // 
             this.btnShowAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShowAnswer.Location = new System.Drawing.Point(253, 371);
+            this.btnShowAnswer.Location = new System.Drawing.Point(423, 375);
             this.btnShowAnswer.Name = "btnShowAnswer";
             this.btnShowAnswer.Size = new System.Drawing.Size(94, 38);
             this.btnShowAnswer.TabIndex = 20;
@@ -513,22 +551,22 @@
             // 
             // pbCardQuestion
             // 
-            this.pbCardQuestion.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.pbCardQuestion.Location = new System.Drawing.Point(3, 130);
+            this.pbCardQuestion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbCardQuestion.Location = new System.Drawing.Point(401, 11);
             this.pbCardQuestion.Name = "pbCardQuestion";
-            this.pbCardQuestion.Size = new System.Drawing.Size(344, 217);
+            this.pbCardQuestion.Size = new System.Drawing.Size(40, 41);
             this.pbCardQuestion.TabIndex = 7;
             this.pbCardQuestion.TabStop = false;
             // 
-            // lblViewCardQText
+            // lblViewCardQ
             // 
-            this.lblViewCardQText.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblViewCardQText.AutoSize = true;
-            this.lblViewCardQText.Location = new System.Drawing.Point(4, 49);
-            this.lblViewCardQText.Name = "lblViewCardQText";
-            this.lblViewCardQText.Size = new System.Drawing.Size(124, 13);
-            this.lblViewCardQText.TabIndex = 6;
-            this.lblViewCardQText.Text = "Card Question Text Here";
+            this.lblViewCardQ.AutoSize = true;
+            this.lblViewCardQ.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblViewCardQ.Location = new System.Drawing.Point(5, 51);
+            this.lblViewCardQ.Name = "lblViewCardQ";
+            this.lblViewCardQ.Size = new System.Drawing.Size(68, 18);
+            this.lblViewCardQ.TabIndex = 6;
+            this.lblViewCardQ.Text = "Question";
             // 
             // lblViewDeckQuestion
             // 
@@ -542,18 +580,67 @@
             // 
             // pnlCardAnswer
             // 
+            this.pnlCardAnswer.Controls.Add(this.lblViewCardAnswer);
+            this.pnlCardAnswer.Controls.Add(this.lblViewCardQuestion2);
+            this.pnlCardAnswer.Controls.Add(this.rtbViewCardAnswer);
+            this.pnlCardAnswer.Controls.Add(this.rtbViewCardQuestion);
             this.pnlCardAnswer.Controls.Add(this.gbSkill);
             this.pnlCardAnswer.Controls.Add(this.pbCardAnswer);
-            this.pnlCardAnswer.Controls.Add(this.lblViewCardAText);
             this.pnlCardAnswer.Controls.Add(this.lblViewDeckAnswer);
-            this.pnlCardAnswer.Location = new System.Drawing.Point(1999, 518);
+            this.pnlCardAnswer.Location = new System.Drawing.Point(1961, 89);
             this.pnlCardAnswer.Name = "pnlCardAnswer";
-            this.pnlCardAnswer.Size = new System.Drawing.Size(357, 471);
+            this.pnlCardAnswer.Size = new System.Drawing.Size(608, 771);
             this.pnlCardAnswer.TabIndex = 21;
+            // 
+            // lblViewCardAnswer
+            // 
+            this.lblViewCardAnswer.AutoSize = true;
+            this.lblViewCardAnswer.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblViewCardAnswer.Location = new System.Drawing.Point(5, 290);
+            this.lblViewCardAnswer.Name = "lblViewCardAnswer";
+            this.lblViewCardAnswer.Size = new System.Drawing.Size(57, 18);
+            this.lblViewCardAnswer.TabIndex = 26;
+            this.lblViewCardAnswer.Text = "Answer";
+            // 
+            // lblViewCardQuestion2
+            // 
+            this.lblViewCardQuestion2.AutoSize = true;
+            this.lblViewCardQuestion2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblViewCardQuestion2.Location = new System.Drawing.Point(5, 49);
+            this.lblViewCardQuestion2.Name = "lblViewCardQuestion2";
+            this.lblViewCardQuestion2.Size = new System.Drawing.Size(68, 18);
+            this.lblViewCardQuestion2.TabIndex = 25;
+            this.lblViewCardQuestion2.Text = "Question";
+            // 
+            // rtbViewCardAnswer
+            // 
+            this.rtbViewCardAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbViewCardAnswer.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbViewCardAnswer.Location = new System.Drawing.Point(8, 311);
+            this.rtbViewCardAnswer.Name = "rtbViewCardAnswer";
+            this.rtbViewCardAnswer.ReadOnly = true;
+            this.rtbViewCardAnswer.Size = new System.Drawing.Size(595, 317);
+            this.rtbViewCardAnswer.TabIndex = 24;
+            this.rtbViewCardAnswer.Text = "";
+            // 
+            // rtbViewCardQuestion
+            // 
+            this.rtbViewCardQuestion.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbViewCardQuestion.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbViewCardQuestion.Location = new System.Drawing.Point(8, 70);
+            this.rtbViewCardQuestion.Name = "rtbViewCardQuestion";
+            this.rtbViewCardQuestion.ReadOnly = true;
+            this.rtbViewCardQuestion.Size = new System.Drawing.Size(595, 181);
+            this.rtbViewCardQuestion.TabIndex = 23;
+            this.rtbViewCardQuestion.Text = "";
             // 
             // gbSkill
             // 
-            this.gbSkill.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.gbSkill.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gbSkill.Controls.Add(this.btnFinishDeck);
             this.gbSkill.Controls.Add(this.rb5);
             this.gbSkill.Controls.Add(this.btnCardAnswerNext);
@@ -561,12 +648,23 @@
             this.gbSkill.Controls.Add(this.rb3);
             this.gbSkill.Controls.Add(this.rb2);
             this.gbSkill.Controls.Add(this.rb1);
-            this.gbSkill.Location = new System.Drawing.Point(6, 329);
+            this.gbSkill.Location = new System.Drawing.Point(8, 634);
             this.gbSkill.Name = "gbSkill";
-            this.gbSkill.Size = new System.Drawing.Size(344, 134);
+            this.gbSkill.Size = new System.Drawing.Size(595, 134);
             this.gbSkill.TabIndex = 22;
             this.gbSkill.TabStop = false;
             this.gbSkill.Text = "How well did you do?";
+            // 
+            // btnFinishDeck
+            // 
+            this.btnFinishDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFinishDeck.Location = new System.Drawing.Point(395, 90);
+            this.btnFinishDeck.Name = "btnFinishDeck";
+            this.btnFinishDeck.Size = new System.Drawing.Size(94, 38);
+            this.btnFinishDeck.TabIndex = 22;
+            this.btnFinishDeck.Text = "Finish";
+            this.btnFinishDeck.UseVisualStyleBackColor = true;
+            this.btnFinishDeck.Click += new System.EventHandler(this.btnFinishDeck_Click);
             // 
             // rb5
             // 
@@ -581,7 +679,7 @@
             // btnCardAnswerNext
             // 
             this.btnCardAnswerNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCardAnswerNext.Location = new System.Drawing.Point(244, 90);
+            this.btnCardAnswerNext.Location = new System.Drawing.Point(495, 90);
             this.btnCardAnswerNext.Name = "btnCardAnswerNext";
             this.btnCardAnswerNext.Size = new System.Drawing.Size(94, 38);
             this.btnCardAnswerNext.TabIndex = 21;
@@ -633,21 +731,12 @@
             // 
             // pbCardAnswer
             // 
-            this.pbCardAnswer.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.pbCardAnswer.Location = new System.Drawing.Point(6, 93);
+            this.pbCardAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbCardAnswer.Location = new System.Drawing.Point(572, 6);
             this.pbCardAnswer.Name = "pbCardAnswer";
-            this.pbCardAnswer.Size = new System.Drawing.Size(344, 217);
+            this.pbCardAnswer.Size = new System.Drawing.Size(31, 40);
             this.pbCardAnswer.TabIndex = 7;
             this.pbCardAnswer.TabStop = false;
-            // 
-            // lblViewCardAText
-            // 
-            this.lblViewCardAText.AutoSize = true;
-            this.lblViewCardAText.Location = new System.Drawing.Point(5, 47);
-            this.lblViewCardAText.Name = "lblViewCardAText";
-            this.lblViewCardAText.Size = new System.Drawing.Size(117, 13);
-            this.lblViewCardAText.TabIndex = 6;
-            this.lblViewCardAText.Text = "Card Answer Text Here";
             // 
             // lblViewDeckAnswer
             // 
@@ -659,32 +748,52 @@
             this.lblViewDeckAnswer.TabIndex = 5;
             this.lblViewDeckAnswer.Text = "Deck_Name_Here";
             // 
-            // button1
+            // cmsTreeView
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(171, 236);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 38);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.cmsTreeView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewToolStripMenuItem,
+            this.editToolStripMenuItem,
+            this.deleteToolStripMenuItem});
+            this.cmsTreeView.Name = "cmsTreeView";
+            this.cmsTreeView.Size = new System.Drawing.Size(108, 70);
             // 
-            // btnFinishDeck
+            // viewToolStripMenuItem
             // 
-            this.btnFinishDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFinishDeck.Location = new System.Drawing.Point(244, 46);
-            this.btnFinishDeck.Name = "btnFinishDeck";
-            this.btnFinishDeck.Size = new System.Drawing.Size(94, 38);
-            this.btnFinishDeck.TabIndex = 22;
-            this.btnFinishDeck.Text = "Finish";
-            this.btnFinishDeck.UseVisualStyleBackColor = true;
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.viewToolStripMenuItem.Text = "View";
+            this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            // 
+            // toolStripContainer1
+            // 
+            // 
+            // toolStripContainer1.ContentPanel
+            // 
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(325, 132);
+            this.toolStripContainer1.Location = new System.Drawing.Point(653, 355);
+            this.toolStripContainer1.Name = "toolStripContainer1";
+            this.toolStripContainer1.Size = new System.Drawing.Size(325, 132);
+            this.toolStripContainer1.TabIndex = 12;
+            this.toolStripContainer1.Text = "toolStripContainer1";
             // 
             // frmFlashCards
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2439, 1062);
+            this.ClientSize = new System.Drawing.Size(2855, 1062);
+            this.Controls.Add(this.toolStripContainer1);
             this.Controls.Add(this.pnlCardAnswer);
             this.Controls.Add(this.pnlCardQuestion);
             this.Controls.Add(this.pnlNewCard);
@@ -709,6 +818,9 @@
             this.gbSkill.ResumeLayout(false);
             this.gbSkill.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).EndInit();
+            this.cmsTreeView.ResumeLayout(false);
+            this.toolStripContainer1.ResumeLayout(false);
+            this.toolStripContainer1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -746,12 +858,11 @@
         private System.Windows.Forms.Label lblCardQText;
         private System.Windows.Forms.Panel pnlCardQuestion;
         private System.Windows.Forms.PictureBox pbCardQuestion;
-        private System.Windows.Forms.Label lblViewCardQText;
+        private System.Windows.Forms.Label lblViewCardQ;
         private System.Windows.Forms.Label lblViewDeckQuestion;
         private System.Windows.Forms.Button btnShowAnswer;
         private System.Windows.Forms.Panel pnlCardAnswer;
         private System.Windows.Forms.PictureBox pbCardAnswer;
-        private System.Windows.Forms.Label lblViewCardAText;
         private System.Windows.Forms.Label lblViewDeckAnswer;
         private System.Windows.Forms.GroupBox gbSkill;
         private System.Windows.Forms.RadioButton rb5;
@@ -768,8 +879,18 @@
         private System.Windows.Forms.Button btnDeleteCard;
         private System.Windows.Forms.Button btnSaveDeck;
         private System.Windows.Forms.Button btnTest;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnCancelNewFolder;
         private System.Windows.Forms.Button btnFinishDeck;
+        private System.Windows.Forms.ContextMenuStrip cmsTreeView;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.RichTextBox rtbViewCardAnswer;
+        private System.Windows.Forms.RichTextBox rtbViewCardQuestion;
+        private System.Windows.Forms.RichTextBox rtbViewCardQuestionText;
+        private System.Windows.Forms.Label lblViewCardAnswer;
+        private System.Windows.Forms.Label lblViewCardQuestion2;
+        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
     }
 }
 
