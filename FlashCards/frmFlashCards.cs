@@ -15,6 +15,7 @@ namespace FlashCards {
     public partial class frmFlashCards : Form {
 
         public struct Card {
+            public int ID;
             public string qText;
             public string qImage;
             public string aText;
@@ -25,7 +26,7 @@ namespace FlashCards {
 
         private List<Card> cards = new List<Card>();
         private static string DB_FILEPATH = "flashcards.sqlite";
-        private int cardIndex = 1;
+        private int cardIndex = 0;
         private bool isEdit = false; // Flag to show if a deck is being edited
         private string currentDeckName = "";
 
@@ -89,7 +90,7 @@ namespace FlashCards {
 
             refreshTreeView();
             showPanel("pnlMain");
-            this.Size = new Size(500, 500);
+            this.Size = new Size(900, 900);
         }
 
 
@@ -98,11 +99,13 @@ namespace FlashCards {
         // Takes user to new folder screen
         private void btnNewFolder_Click(object sender, EventArgs e) {
             showPanel("pnlNewFolder");
+            txtFolderName.Text = "";
         }
 
 
         // Takes user to the new deck screen
         private void btnNewDeck_Click(object sender, EventArgs e) {
+
             showPanel("pnlNewDeck");
 
             // Populate the Folder dropdown
@@ -118,7 +121,11 @@ namespace FlashCards {
                 cbFolderName.Items.Add(reader["folder_name"]);
             }
 
+            reader.Close();
+            db.Close();
+
             cbFolderName.SelectedIndex = 0;
+            txtDeckName.Text = "";
         }
 
 
@@ -141,7 +148,9 @@ namespace FlashCards {
 
         // Open deck for viewing
         private void tvDecks_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e) {
-            viewDeck(e.Node.Text);
+            if (e.Node.Parent != null) {
+                viewDeck(e.Node.Text);
+            }
         }
 
 
@@ -150,12 +159,19 @@ namespace FlashCards {
             viewDeck(tvDecks.SelectedNode.Text);
         }
 
+
+        // Opens deck for editing
+        private void editToolStripMenuItem_Click(object sender, EventArgs e) {
+            editDeck(tvDecks.SelectedNode.Text);
+        }
+
         #endregion
 
         #region New Folder Panel
 
         // Cancels new deck creation
         private void btnCancelNewFolder_Click(object sender, EventArgs e) {
+            txtFolderName.Text = "";
             showPanel("pnlMain");
         }
 
@@ -210,6 +226,7 @@ namespace FlashCards {
 
             // Cancel deck creation and return to main panel
             if (verifyDialogue("Are you sure you want to cancel this deck? All unsaved progress will be lost.")) {
+                txtDeckName.Text = "";
                 clearCardInputs();
                 lstCards.Items.Clear();
                 cards.Clear();
@@ -234,7 +251,11 @@ namespace FlashCards {
 
             reader.Close();
             db.Close();
+
+
             showPanel("pnlNewCard");
+            cards.Clear();
+            lstCards.Items.Clear();
             cardIndex = 0;
         }
 
@@ -247,6 +268,7 @@ namespace FlashCards {
 
             // Cancel deck creation and return to main panel
             if (verifyDialogue("Are you sure you want to cancel this deck? All unsaved progress will be lost.")) {
+                txtDeckName.Text = "";
                 clearCardInputs();
                 lstCards.Items.Clear();
                 cards.Clear();
@@ -272,46 +294,89 @@ namespace FlashCards {
 
             // Save current card
             Card tempCard = new Card();
+            tempCard.ID = cardIndex++;
             tempCard.qText = rtbCardQ.Text;
             tempCard.qImage = txtCardQImage.Text;
             tempCard.aText = rtbCardA.Text;
             tempCard.aImage = txtCardAImage.Text;
             tempCard.skill = 3;
-
-            if (lstCards.Items.Count == cards.Count()) {
-                cards.Add(tempCard);
-            }
-            else {
-                cards[cardIndex] = tempCard;
-            }
+            cards.Add(tempCard);
 
 
+            // Clear screen for next card
             clearCardInputs();
+            refreshCardsListBox();
+            lstCards.ClearSelected();
+        }
 
 
-            // Add card to listbox
-            string description = tempCard.qText;
-            if (description.Length > 35) {
-                description = description.Substring(0, 35) + "...";
-            }
-            lstCards.Items.Add(Convert.ToString(++cardIndex) + ") " + description);
+        // Saves edit to current card and clears inputs
+        private void btnSaveCardEdit_Click(object sender, EventArgs e) {
+
+            // Save card to the selected index in the cards list
+            Card tempCard = new Card();
+            tempCard.qText = rtbCardQ.Text;
+            tempCard.qImage = txtCardQImage.Text;
+            tempCard.aText = rtbCardA.Text;
+            tempCard.aImage = txtCardAImage.Text;
+            cards[lstCards.SelectedIndex] = tempCard;
+
+
+            // Clear screen for next card
+            clearCardInputs();
+            refreshCardsListBox();
+            lstCards.ClearSelected();
+            lstCards.SelectedIndex = -1;
+            btnDeleteCard.Enabled = false;
+            btnSaveCardEdit.Enabled = false;
         }
 
 
         // Saves a deck to the db
         private void btnSaveDeck_Click(object sender, EventArgs e) {
-            
-            // Insert the deck
+
+            // Make sure there is at least 1 card
+            if (cards.Count() < 1) {
+                MessageBox.Show("There must be at least 1 card to save the deck.");
+                return;
+            }
+
+
+            // Delete deck and cards if deck already exists
             SQLiteConnection db = openDB();
+            int deckID = getDeckID(txtDeckName.Text, db);
+            int folderID = 0;
+
+            if (deckID != -1) {
+
+                folderID = getFolderID(txtDeckName.Text, db);
+
+                // Delete deck
+                SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
+                delDeck.Parameters.AddWithValue("@deckIDParam", deckID);
+                delDeck.ExecuteNonQuery();
+                delDeck.Parameters.Clear();
+
+                // Delete cards
+                SQLiteCommand delCards = new SQLiteCommand("DELETE FROM Card WHERE deck_id = @deckIDParam", db);
+                delCards.Parameters.AddWithValue("@deckIDParam", deckID);
+                delCards.ExecuteNonQuery();
+                delCards.Parameters.Clear();
+            } else {
+                folderID = cbFolderName.SelectedIndex;
+            }
+            
+
+            // Insert the deck
             SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Deck (deck_name, folder_id) VALUES (@deckNameParam,@folderIDParam)", db);
             cmd.Parameters.AddWithValue("@deckNameParam", txtDeckName.Text);
-            cmd.Parameters.AddWithValue("@folderIDParam", cbFolderName.SelectedIndex);
+            cmd.Parameters.AddWithValue("@folderIDParam", folderID);
             cmd.ExecuteNonQuery();
             cmd.Parameters.Clear();
             
 
             // Insert each card
-            int deckID = getDeckID(txtDeckName.Text, db);
+            deckID = getDeckID(txtDeckName.Text, db);
 
             for (int i = 0; i < cards.Count; i++) {
                 SQLiteCommand insertSQL = new SQLiteCommand("INSERT INTO Card (card_q_text, card_q_image, card_a_text, card_a_image, card_skill, deck_id) " +
@@ -355,9 +420,11 @@ namespace FlashCards {
                 txtCardAImage.Text = tempCard.aImage;
 
                 btnDeleteCard.Enabled = true;
+                btnSaveCardEdit.Enabled = true;
             }
             else {
                 btnDeleteCard.Enabled = false;
+                btnSaveCardEdit.Enabled = false;
             }
         }
 
@@ -453,6 +520,21 @@ namespace FlashCards {
         }
 
 
+        // Refreshes the list of cards in the pnlNewCard panel
+        private void refreshCardsListBox() {
+
+            lstCards.Items.Clear();
+
+            for(int i = 0; i < cards.Count(); i++) {
+                string description = cards[i].qText;
+                if (description.Length > 35) {
+                    description = description.Substring(0, 35) + "...";
+                }
+                lstCards.Items.Add(Convert.ToString(i + 1) + ") " + description);
+            }
+        }
+
+        
         // Sets image path in a textbox
         private void setImagePath(TextBox t) {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -492,8 +574,7 @@ namespace FlashCards {
 
             tvDecks.Nodes.Clear();
             
-
-
+            
             // Get folders
             string sql = "select * from Folder";
             SQLiteCommand cmd = new SQLiteCommand(sql, db);
@@ -502,6 +583,8 @@ namespace FlashCards {
             while (reader.Read()) {
                 tvDecks.Nodes.Add(Convert.ToString(reader["folder_name"]));
             }
+            reader.Close();
+
 
             // Folder for decks without a folder
             tvDecks.Nodes.Add("- No Folder -");
@@ -525,6 +608,9 @@ namespace FlashCards {
                     tvDecks.Nodes[parentIndex].Nodes.Add(deckName);
                 }
             }
+
+            reader.Close();
+            db.Close();
         }
         
 
@@ -636,6 +722,7 @@ namespace FlashCards {
                     cards.Add(c);
                 }
                 reader.Close();
+                db.Close();
 
 
                 // Change to question panel and load the first card
@@ -652,18 +739,87 @@ namespace FlashCards {
         }
 
 
+        // Starts editing a deck of a given name
+        private void editDeck(string deckName) {
+
+            if (tvDecks.SelectedNode.Parent != null) {
+
+                // Gather cards from db
+                cards.Clear();
+
+                SQLiteConnection db = openDB();
+                int deckID = getDeckID(deckName, db);
+                string sql = "select * from Card where deck_id = " + deckID;
+                SQLiteCommand cmd = new SQLiteCommand(sql, db);
+                SQLiteDataReader reader = cmd.ExecuteReader();
+
+                int counter = 0;
+                while (reader.Read()) {
+                    Card c = new Card();
+                    c.ID = counter++;
+                    c.qText = reader["card_q_text"].ToString();
+                    c.qImage = reader["card_q_image"].ToString();
+                    c.aText = reader["card_a_text"].ToString();
+                    c.aImage = reader["card_a_image"].ToString();
+                    c.skill = Convert.ToInt32(reader["card_skill"]);
+
+                    cards.Add(c);
+                }
+                reader.Close();
+                db.Close();
+
+
+                // Get panel ready for editing
+                txtDeckName.Text = deckName;
+                refreshCardsListBox();
+                showPanel("pnlNewCard");
+            }
+        }
+
+
         // Returns the ID of the deck with a given name
-        // Opens and closes a db connection, so don't have one open when calling this function
         private int getDeckID(string deckName, SQLiteConnection db) {
 
             string sql = "select * from Deck where deck_name = '" + deckName + "'";
             SQLiteCommand cmd = new SQLiteCommand(sql, db);
             SQLiteDataReader reader = cmd.ExecuteReader();
             reader.Read();
-            int deckID = Convert.ToInt32(reader["deck_id"]);
-            reader.Close();
+            int deckID = 0;
 
+            try {
+                deckID = Convert.ToInt32(reader["deck_id"]);
+            } catch (Exception e) {
+                MessageBox.Show("No such deck");
+                deckID = -1;
+            } finally {
+                reader.Close();
+            }
+            
             return deckID;
+        }
+
+
+        // Returns the ID of the folder that a deck belongs to
+        private int getFolderID(string deckName, SQLiteConnection db) {
+
+            string sql = "select * from Deck where deck_name = '" + deckName + "'";
+            SQLiteCommand cmd = new SQLiteCommand(sql, db);
+            SQLiteDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            int folderID = 0;
+
+            try {
+                folderID = Convert.ToInt32(reader["folder_id"]);
+            }
+            catch (Exception e) {
+                MessageBox.Show("No such folder");
+                folderID = -1;
+            }
+            finally {
+                reader.Close();
+            }
+
+            return folderID;
         }
 
         #endregion

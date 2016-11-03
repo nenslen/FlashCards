@@ -44,6 +44,7 @@
             this.txtDeckName = new System.Windows.Forms.TextBox();
             this.lblDeckName = new System.Windows.Forms.Label();
             this.pnlNewCard = new System.Windows.Forms.Panel();
+            this.btnSaveCardEdit = new System.Windows.Forms.Button();
             this.btnSaveDeck = new System.Windows.Forms.Button();
             this.btnDeleteCard = new System.Windows.Forms.Button();
             this.lstCards = new System.Windows.Forms.ListBox();
@@ -87,7 +88,7 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.resetSkillsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlMain.SuspendLayout();
             this.pnlNewFolder.SuspendLayout();
             this.pnlNewDeck.SuspendLayout();
@@ -98,7 +99,6 @@
             this.gbSkill.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).BeginInit();
             this.cmsTreeView.SuspendLayout();
-            this.toolStripContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlMain
@@ -168,8 +168,8 @@
             // 
             // btnCancelNewFolder
             // 
-            this.btnCancelNewFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancelNewFolder.Location = new System.Drawing.Point(171, 236);
+            this.btnCancelNewFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCancelNewFolder.Location = new System.Drawing.Point(3, 236);
             this.btnCancelNewFolder.Name = "btnCancelNewFolder";
             this.btnCancelNewFolder.Size = new System.Drawing.Size(94, 38);
             this.btnCancelNewFolder.TabIndex = 11;
@@ -232,8 +232,8 @@
             // 
             // btnCancelNewDeck
             // 
-            this.btnCancelNewDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancelNewDeck.Location = new System.Drawing.Point(226, 236);
+            this.btnCancelNewDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCancelNewDeck.Location = new System.Drawing.Point(3, 236);
             this.btnCancelNewDeck.Name = "btnCancelNewDeck";
             this.btnCancelNewDeck.Size = new System.Drawing.Size(94, 38);
             this.btnCancelNewDeck.TabIndex = 10;
@@ -302,6 +302,7 @@
             // 
             // pnlNewCard
             // 
+            this.pnlNewCard.Controls.Add(this.btnSaveCardEdit);
             this.pnlNewCard.Controls.Add(this.btnSaveDeck);
             this.pnlNewCard.Controls.Add(this.btnDeleteCard);
             this.pnlNewCard.Controls.Add(this.lstCards);
@@ -325,6 +326,18 @@
             this.pnlNewCard.Size = new System.Drawing.Size(724, 429);
             this.pnlNewCard.TabIndex = 8;
             // 
+            // btnSaveCardEdit
+            // 
+            this.btnSaveCardEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveCardEdit.Enabled = false;
+            this.btnSaveCardEdit.Location = new System.Drawing.Point(427, 388);
+            this.btnSaveCardEdit.Name = "btnSaveCardEdit";
+            this.btnSaveCardEdit.Size = new System.Drawing.Size(94, 38);
+            this.btnSaveCardEdit.TabIndex = 23;
+            this.btnSaveCardEdit.Text = "Save Edit";
+            this.btnSaveCardEdit.UseVisualStyleBackColor = true;
+            this.btnSaveCardEdit.Click += new System.EventHandler(this.btnSaveCardEdit_Click);
+            // 
             // btnSaveDeck
             // 
             this.btnSaveDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -340,7 +353,7 @@
             // 
             this.btnDeleteCard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDeleteCard.Enabled = false;
-            this.btnDeleteCard.Location = new System.Drawing.Point(427, 388);
+            this.btnDeleteCard.Location = new System.Drawing.Point(327, 388);
             this.btnDeleteCard.Name = "btnDeleteCard";
             this.btnDeleteCard.Size = new System.Drawing.Size(94, 38);
             this.btnDeleteCard.TabIndex = 21;
@@ -359,8 +372,8 @@
             // 
             // btnNewCardCancel
             // 
-            this.btnNewCardCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnNewCardCancel.Location = new System.Drawing.Point(327, 388);
+            this.btnNewCardCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnNewCardCancel.Location = new System.Drawing.Point(3, 388);
             this.btnNewCardCancel.Name = "btnNewCardCancel";
             this.btnNewCardCancel.Size = new System.Drawing.Size(94, 38);
             this.btnNewCardCancel.TabIndex = 19;
@@ -488,7 +501,7 @@
             this.btnNewCardSave.Name = "btnNewCardSave";
             this.btnNewCardSave.Size = new System.Drawing.Size(94, 38);
             this.btnNewCardSave.TabIndex = 7;
-            this.btnNewCardSave.Text = "Save Card";
+            this.btnNewCardSave.Text = "Create Card";
             this.btnNewCardSave.UseVisualStyleBackColor = true;
             this.btnNewCardSave.Click += new System.EventHandler(this.btnNewCardNext_Click);
             // 
@@ -753,47 +766,42 @@
             this.cmsTreeView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewToolStripMenuItem,
             this.editToolStripMenuItem,
+            this.resetSkillsToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.cmsTreeView.Name = "cmsTreeView";
-            this.cmsTreeView.Size = new System.Drawing.Size(108, 70);
+            this.cmsTreeView.Size = new System.Drawing.Size(132, 92);
             // 
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.viewToolStripMenuItem.Text = "View";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editToolStripMenuItem.Text = "Edit";
+            this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             // 
-            // toolStripContainer1
+            // resetSkillsToolStripMenuItem
             // 
-            // 
-            // toolStripContainer1.ContentPanel
-            // 
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(325, 132);
-            this.toolStripContainer1.Location = new System.Drawing.Point(653, 355);
-            this.toolStripContainer1.Name = "toolStripContainer1";
-            this.toolStripContainer1.Size = new System.Drawing.Size(325, 132);
-            this.toolStripContainer1.TabIndex = 12;
-            this.toolStripContainer1.Text = "toolStripContainer1";
+            this.resetSkillsToolStripMenuItem.Name = "resetSkillsToolStripMenuItem";
+            this.resetSkillsToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.resetSkillsToolStripMenuItem.Text = "Reset Skills";
             // 
             // frmFlashCards
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2855, 1062);
-            this.Controls.Add(this.toolStripContainer1);
             this.Controls.Add(this.pnlCardAnswer);
             this.Controls.Add(this.pnlCardQuestion);
             this.Controls.Add(this.pnlNewCard);
@@ -819,8 +827,6 @@
             this.gbSkill.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).EndInit();
             this.cmsTreeView.ResumeLayout(false);
-            this.toolStripContainer1.ResumeLayout(false);
-            this.toolStripContainer1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -890,7 +896,8 @@
         private System.Windows.Forms.RichTextBox rtbViewCardQuestionText;
         private System.Windows.Forms.Label lblViewCardAnswer;
         private System.Windows.Forms.Label lblViewCardQuestion2;
-        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
+        private System.Windows.Forms.Button btnSaveCardEdit;
+        private System.Windows.Forms.ToolStripMenuItem resetSkillsToolStripMenuItem;
     }
 }
 
