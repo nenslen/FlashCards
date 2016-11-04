@@ -87,8 +87,8 @@
             this.cmsTreeView = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetSkillsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlMain.SuspendLayout();
             this.pnlNewFolder.SuspendLayout();
             this.pnlNewDeck.SuspendLayout();
@@ -769,7 +769,7 @@
             this.resetSkillsToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.cmsTreeView.Name = "cmsTreeView";
-            this.cmsTreeView.Size = new System.Drawing.Size(132, 92);
+            this.cmsTreeView.Size = new System.Drawing.Size(153, 114);
             // 
             // viewToolStripMenuItem
             // 
@@ -785,17 +785,19 @@
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
+            // resetSkillsToolStripMenuItem
+            // 
+            this.resetSkillsToolStripMenuItem.Name = "resetSkillsToolStripMenuItem";
+            this.resetSkillsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.resetSkillsToolStripMenuItem.Text = "Reset Skills";
+            this.resetSkillsToolStripMenuItem.Click += new System.EventHandler(this.resetSkillsToolStripMenuItem_Click);
+            // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
-            // 
-            // resetSkillsToolStripMenuItem
-            // 
-            this.resetSkillsToolStripMenuItem.Name = "resetSkillsToolStripMenuItem";
-            this.resetSkillsToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
-            this.resetSkillsToolStripMenuItem.Text = "Reset Skills";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // frmFlashCards
             // 

@@ -29,6 +29,8 @@ namespace FlashCards {
         private int cardIndex = 0;
         private bool isEdit = false; // Flag to show if a deck is being edited
         private string currentDeckName = "";
+        private int currentDeckID = 0;
+
 
         public frmFlashCards() {
             InitializeComponent();
@@ -67,6 +69,7 @@ namespace FlashCards {
                 // Create deck table
                 sql = "create table Deck (deck_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                          "deck_name varchar(1000)," +
+                                         "deck_percent INTEGER," +
                                          "folder_id INTEGER," +
                                          "FOREIGN KEY(folder_id) REFERENCES Folder(folder_id))";
                 command.CommandText = sql;
@@ -149,20 +152,64 @@ namespace FlashCards {
         // Open deck for viewing
         private void tvDecks_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e) {
             if (e.Node.Parent != null) {
-                viewDeck(e.Node.Text);
+
+                int d = Convert.ToInt32(e.Node.Tag);
+                //viewDeck(e.Node.Text);
+                viewDeck(d);
             }
         }
 
 
         // Open deck for viewing
         private void viewToolStripMenuItem_Click(object sender, EventArgs e) {
-            viewDeck(tvDecks.SelectedNode.Text);
+            //viewDeck(tvDecks.SelectedNode.Text);
         }
 
 
         // Opens deck for editing
         private void editToolStripMenuItem_Click(object sender, EventArgs e) {
-            editDeck(tvDecks.SelectedNode.Text);
+            //editDeck(tvDecks.SelectedNode.Text);
+        }
+
+
+        // Resets skills for a deck
+        private void resetSkillsToolStripMenuItem_Click(object sender, EventArgs e) {
+            
+            if (verifyDialogue("Are you sure? All skills will be reset for this deck.")) {
+                SQLiteConnection db = openDB();
+                int deckID = getDeckID(tvDecks.SelectedNode.Text, db);
+                SQLiteCommand cmd = new SQLiteCommand("UPDATE Card SET card_skill = 3 WHERE deck_id = " + deckID, db);
+                cmd.ExecuteNonQuery();
+                db.Close();
+            }
+        }
+
+
+        // Deletes a deck
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e) {
+
+            if (verifyDialogue("Are you sure? This deck and all cards within will be permanently deleted.")) {
+                //SQLiteConnection db = openDB();
+                //int deckID = getDeckID(tvDecks.SelectedNode.Text, db);
+
+                deleteDeck(tvDecks.SelectedNode.Text);
+                /*
+                // Delete deck
+                SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
+                delDeck.Parameters.AddWithValue("@deckIDParam", deckID);
+                delDeck.ExecuteNonQuery();
+                delDeck.Parameters.Clear();
+
+                // Delete cards
+                SQLiteCommand delCards = new SQLiteCommand("DELETE FROM Card WHERE deck_id = @deckIDParam", db);
+                delCards.Parameters.AddWithValue("@deckIDParam", deckID);
+                delCards.ExecuteNonQuery();
+                delCards.Parameters.Clear();
+                
+                db.Close();
+                */            
+                refreshTreeView();
+            }
         }
 
         #endregion
@@ -344,32 +391,24 @@ namespace FlashCards {
 
             // Delete deck and cards if deck already exists
             SQLiteConnection db = openDB();
-            int deckID = getDeckID(txtDeckName.Text, db);
+            //int deckID = getDeckID(txtDeckName.Text, db);
+            int deckID = currentDeckID;
             int folderID = 0;
+            int deckPercent = getDeckPercentage();
 
             if (deckID != -1) {
-
-                folderID = getFolderID(txtDeckName.Text, db);
-
-                // Delete deck
-                SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
-                delDeck.Parameters.AddWithValue("@deckIDParam", deckID);
-                delDeck.ExecuteNonQuery();
-                delDeck.Parameters.Clear();
-
-                // Delete cards
-                SQLiteCommand delCards = new SQLiteCommand("DELETE FROM Card WHERE deck_id = @deckIDParam", db);
-                delCards.Parameters.AddWithValue("@deckIDParam", deckID);
-                delCards.ExecuteNonQuery();
-                delCards.Parameters.Clear();
+                //TODO
+                // GET folder ID here and set it so that the deck will go into the correct folder again (this might not actually happen)
+                deleteDeck(txtDeckName.Text);
             } else {
                 folderID = cbFolderName.SelectedIndex;
             }
             
 
             // Insert the deck
-            SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Deck (deck_name, folder_id) VALUES (@deckNameParam,@folderIDParam)", db);
+            SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Deck (deck_name, deck_percent, folder_id) VALUES (@deckNameParam,@deckPercent,@folderIDParam)", db);
             cmd.Parameters.AddWithValue("@deckNameParam", txtDeckName.Text);
+            cmd.Parameters.AddWithValue("@deckPercent", deckPercent);
             cmd.Parameters.AddWithValue("@folderIDParam", folderID);
             cmd.ExecuteNonQuery();
             cmd.Parameters.Clear();
@@ -595,18 +634,25 @@ namespace FlashCards {
             cmd = new SQLiteCommand(sql, db);
             reader = cmd.ExecuteReader();
 
+            int deckIndex = 0;
             while (reader.Read()) {
                 // Add each deck to the right folder
-                int parentIndex = Convert.ToInt16(reader["folder_id"]) - 1;
-                string deckName = Convert.ToString(reader["deck_name"]);
+                int parentIndex = Convert.ToInt32(reader["folder_id"]) - 1;
+                string deckName = Convert.ToString(reader["deck_name"]) + " (" + Convert.ToString(reader["deck_percent"]) + "%)";
+                int ID = Convert.ToInt32(reader["deck_id"]);
 
                 // Check if deck has folder
                 if (parentIndex == -1) {
                     tvDecks.Nodes[tvDecks.Nodes.Count - 1].Nodes.Add(deckName);
+                    tvDecks.Nodes[tvDecks.Nodes.Count - 1].Nodes[deckIndex].Tag = ID;
                 }
                 else {
                     tvDecks.Nodes[parentIndex].Nodes.Add(deckName);
+                    tvDecks.Nodes[parentIndex].Nodes[deckIndex].Tag = ID;
                 }
+
+                // Set the deck's tag as its ID
+                
             }
 
             reader.Close();
@@ -645,7 +691,8 @@ namespace FlashCards {
 
         // Shows a card answer on the pnlCardAnswer panel
         private void showCardAnswer(int index) {
-            lblViewDeckAnswer.Text = "Deck: " + currentDeckName;
+            int complete = getDeckPercentage();
+            lblViewDeckAnswer.Text = "Deck: " + currentDeckName + " (" + complete + "% complete)";
             rtbViewCardQuestion.Text = cards[index].qText;
             rtbViewCardAnswer.Text = cards[index].aText;
 
@@ -666,6 +713,21 @@ namespace FlashCards {
                     rb5.Checked = true;
                     break;
             }
+        }
+
+
+        // Returns what percentage of the deck is complete (based on currently loaded cards in the cards list)
+        private int getDeckPercentage() {
+
+            double totalSkill = 0;
+            double maxSkill = 0;
+
+            foreach(Card c in cards) {
+                totalSkill += c.skill;
+                maxSkill += 5;
+            }
+
+            return Convert.ToInt32((totalSkill / maxSkill) * 100);
         }
 
 
@@ -696,17 +758,19 @@ namespace FlashCards {
 
 
         // Starts viewing a deck of a given name
-        private void viewDeck(string deckName) {
+        //private void viewDeck(string deckName) {
+        private void viewDeck(int deckID) {
             
             if (tvDecks.SelectedNode.Parent != null) {
 
                 cards.Clear();
-                currentDeckName = deckName;
+                //currentDeckName = deckName;
+                currentDeckID = deckID;
 
 
                 // Get cards
                 SQLiteConnection db = openDB();
-                int deckID = getDeckID(deckName, db);
+                //int deckID = getDeckID(deckName, db);
                 string sql = "select * from Card where deck_id = " + deckID;
                 SQLiteCommand cmd = new SQLiteCommand(sql, db);
                 SQLiteDataReader reader = cmd.ExecuteReader();
@@ -740,15 +804,17 @@ namespace FlashCards {
 
 
         // Starts editing a deck of a given name
-        private void editDeck(string deckName) {
+        //private void editDeck(string deckName) {
+        private void editDeck(int deckID) {
 
             if (tvDecks.SelectedNode.Parent != null) {
 
+                currentDeckID = deckID;
                 // Gather cards from db
                 cards.Clear();
 
                 SQLiteConnection db = openDB();
-                int deckID = getDeckID(deckName, db);
+                //int deckID = getDeckID(deckName, db);
                 string sql = "select * from Card where deck_id = " + deckID;
                 SQLiteCommand cmd = new SQLiteCommand(sql, db);
                 SQLiteDataReader reader = cmd.ExecuteReader();
@@ -770,10 +836,29 @@ namespace FlashCards {
 
 
                 // Get panel ready for editing
-                txtDeckName.Text = deckName;
+                //txtDeckName.Text = deckName;
                 refreshCardsListBox();
                 showPanel("pnlNewCard");
             }
+        }
+
+
+        // Deletes a deck and all of its cards
+        private void deleteDeck(string deckName) {
+            SQLiteConnection db = openDB();
+            int deckID = getDeckID(deckName, db);
+
+            // Delete deck
+            SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
+            delDeck.Parameters.AddWithValue("@deckIDParam", deckID);
+            delDeck.ExecuteNonQuery();
+            delDeck.Parameters.Clear();
+
+            // Delete cards
+            SQLiteCommand delCards = new SQLiteCommand("DELETE FROM Card WHERE deck_id = @deckIDParam", db);
+            delCards.Parameters.AddWithValue("@deckIDParam", deckID);
+            delCards.ExecuteNonQuery();
+            delCards.Parameters.Clear();
         }
 
 
@@ -796,6 +881,30 @@ namespace FlashCards {
             }
             
             return deckID;
+        }
+
+
+        // Returns the name of the deck with a given ID
+        private string getDeckName(int deckID, SQLiteConnection db) {
+
+            string sql = "select * from Deck where deck_id = '" + deckID + "'";
+            SQLiteCommand cmd = new SQLiteCommand(sql, db);
+            SQLiteDataReader reader = cmd.ExecuteReader();
+            reader.Read();
+            string deckName = "";
+
+            try {
+                deckName = Convert.ToString(reader["deck_name"]);
+            }
+            catch (Exception e) {
+                MessageBox.Show("No such deck");
+                deckName = "";
+            }
+            finally {
+                reader.Close();
+            }
+
+            return deckName;
         }
 
 
@@ -822,6 +931,9 @@ namespace FlashCards {
             return folderID;
         }
 
+
         #endregion
+
+        
     }
 }
