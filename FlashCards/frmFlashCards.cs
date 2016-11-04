@@ -50,10 +50,6 @@ namespace FlashCards {
         /*
          * TODO
          * 
-         * Escape characters or do not allow certain chars
-         * 
-         * Show question and answer on same slide (just make answer visible? Panel within a panel? Show question on answer panel?)
-         * 
          * Add stats to answer slide
          */
 
@@ -114,6 +110,7 @@ namespace FlashCards {
         private void btnNewFolder_Click(object sender, EventArgs e) {
             showPanel("pnlNewFolder");
             txtFolderName.Text = "";
+            txtFolderName.Focus();
         }
 
 
@@ -138,8 +135,10 @@ namespace FlashCards {
             reader.Close();
             db.Close();
 
+
             cbFolderName.SelectedIndex = 0;
             txtDeckName.Text = "";
+            txtDeckName.Focus();
         }
 
 
@@ -189,10 +188,19 @@ namespace FlashCards {
             if (verifyDialogue("Are you sure? All skills will be reset for this deck.")) {
                 SQLiteConnection db = openDB();
                 int deckID = Convert.ToInt32(tvDecks.SelectedNode.Tag);
+
+                // Reset cards
                 SQLiteCommand cmd = new SQLiteCommand("UPDATE Card SET card_skill = 3 WHERE deck_id = " + deckID, db);
                 cmd.ExecuteNonQuery();
+
+                // Reset deck
+                cmd.CommandText = "UPDATE Deck SET deck_percent = 60 WHERE deck_id = " + deckID.ToString();
+                cmd.ExecuteNonQuery();
+
                 db.Close();
             }
+
+            refreshTreeView();
         }
 
 
@@ -273,6 +281,7 @@ namespace FlashCards {
             cards.Clear();
             lstCards.Items.Clear();
             cardIndex = 0;
+            rtbCardQ.Focus();
         }
 
         #endregion
@@ -323,6 +332,7 @@ namespace FlashCards {
             clearCardInputs();
             refreshCardsListBox();
             lstCards.ClearSelected();
+            rtbCardQ.Focus();
         }
 
 
@@ -513,6 +523,29 @@ namespace FlashCards {
             showPanel("pnlMain");
         }
 
+
+        // Shows stats for current deck
+        private void btnShowStats_Click(object sender, EventArgs e) {
+            
+            int[] skills = new int[5];
+            double total = 0;
+
+            foreach (Card c in cards) {
+                skills[c.skill - 1]++;
+                total++;
+            }
+
+
+            string message = "Total Cards: " + total     + "\n" +
+                             "Perfect: "     + skills[4] + " (" + (skills[4] / total) * 100 + "%)\n" +
+                             "Good: "        + skills[3] + " (" + (skills[3] / total) *100 + "%)\n" +
+                             "Neutral: "     + skills[2] + " (" + (skills[2] / total) *100 + "%)\n" +
+                             "Not great: "   + skills[1] + " (" + (skills[1] / total) *100 + "%)\n" +
+                             "Very Bad: "    + skills[0] + " (" + (skills[0] / total) *100 + "%)\n";
+
+            MessageBox.Show(message);
+        }
+
         #endregion
 
         private void btnTest_Click(object sender, EventArgs e) {
@@ -641,6 +674,8 @@ namespace FlashCards {
 
             reader.Close();
             db.Close();
+
+            tvDecks.ExpandAll();
         }
         
 
@@ -846,7 +881,6 @@ namespace FlashCards {
             try {
                 deckID = Convert.ToInt32(reader["deck_id"]);
             } catch (Exception e) {
-                MessageBox.Show("No such deck");
                 deckID = -1;
             } finally {
                 reader.Close();
@@ -869,7 +903,6 @@ namespace FlashCards {
                 deckName = Convert.ToString(reader["deck_name"]);
             }
             catch (Exception e) {
-                MessageBox.Show("No such deck");
                 deckName = "";
             }
             finally {
@@ -893,7 +926,6 @@ namespace FlashCards {
                 folderID = Convert.ToInt32(reader["folder_id"]);
             }
             catch (Exception e) {
-                MessageBox.Show("No such folder");
                 folderID = -1;
             }
             finally {
@@ -918,7 +950,6 @@ namespace FlashCards {
                 folderID = Convert.ToInt32(reader["folder_id"]);
             }
             catch (Exception e) {
-                MessageBox.Show("No such folder");
                 folderID = -1;
             }
             finally {
@@ -926,7 +957,8 @@ namespace FlashCards {
             }
 
             return folderID;
-        } 
+        }
+
 
         #endregion
 

@@ -25,7 +25,6 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.pnlMain = new System.Windows.Forms.Panel();
-            this.btnTest = new System.Windows.Forms.Button();
             this.tvDecks = new System.Windows.Forms.TreeView();
             this.btnNewDeck = new System.Windows.Forms.Button();
             this.btnNewFolder = new System.Windows.Forms.Button();
@@ -89,6 +88,7 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetSkillsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnShowStats = new System.Windows.Forms.Button();
             this.pnlMain.SuspendLayout();
             this.pnlNewFolder.SuspendLayout();
             this.pnlNewDeck.SuspendLayout();
@@ -103,7 +103,6 @@
             // 
             // pnlMain
             // 
-            this.pnlMain.Controls.Add(this.btnTest);
             this.pnlMain.Controls.Add(this.tvDecks);
             this.pnlMain.Controls.Add(this.btnNewDeck);
             this.pnlMain.Controls.Add(this.btnNewFolder);
@@ -111,16 +110,6 @@
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(391, 277);
             this.pnlMain.TabIndex = 0;
-            // 
-            // btnTest
-            // 
-            this.btnTest.Location = new System.Drawing.Point(223, 11);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
-            this.btnTest.TabIndex = 4;
-            this.btnTest.Text = "TEST";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // tvDecks
             // 
@@ -172,7 +161,7 @@
             this.btnCancelNewFolder.Location = new System.Drawing.Point(3, 236);
             this.btnCancelNewFolder.Name = "btnCancelNewFolder";
             this.btnCancelNewFolder.Size = new System.Drawing.Size(94, 38);
-            this.btnCancelNewFolder.TabIndex = 11;
+            this.btnCancelNewFolder.TabIndex = 2;
             this.btnCancelNewFolder.Text = "Cancel";
             this.btnCancelNewFolder.UseVisualStyleBackColor = true;
             this.btnCancelNewFolder.Click += new System.EventHandler(this.btnCancelNewFolder_Click);
@@ -183,7 +172,7 @@
             this.btnCreateNewFolder.Location = new System.Drawing.Point(271, 236);
             this.btnCreateNewFolder.Name = "btnCreateNewFolder";
             this.btnCreateNewFolder.Size = new System.Drawing.Size(94, 38);
-            this.btnCreateNewFolder.TabIndex = 4;
+            this.btnCreateNewFolder.TabIndex = 1;
             this.btnCreateNewFolder.Text = "Done";
             this.btnCreateNewFolder.UseVisualStyleBackColor = true;
             this.btnCreateNewFolder.Click += new System.EventHandler(this.btnCreateNewFolder_Click);
@@ -194,7 +183,7 @@
             this.txtFolderName.Location = new System.Drawing.Point(114, 122);
             this.txtFolderName.Name = "txtFolderName";
             this.txtFolderName.Size = new System.Drawing.Size(218, 20);
-            this.txtFolderName.TabIndex = 2;
+            this.txtFolderName.TabIndex = 0;
             // 
             // lblFolderName
             // 
@@ -236,7 +225,7 @@
             this.btnCancelNewDeck.Location = new System.Drawing.Point(3, 236);
             this.btnCancelNewDeck.Name = "btnCancelNewDeck";
             this.btnCancelNewDeck.Size = new System.Drawing.Size(94, 38);
-            this.btnCancelNewDeck.TabIndex = 10;
+            this.btnCancelNewDeck.TabIndex = 2;
             this.btnCancelNewDeck.Text = "Cancel";
             this.btnCancelNewDeck.UseVisualStyleBackColor = true;
             this.btnCancelNewDeck.Click += new System.EventHandler(this.btnCancelNewDeck_Click);
@@ -267,7 +256,7 @@
             this.btnNewDeckNext.Location = new System.Drawing.Point(326, 236);
             this.btnNewDeckNext.Name = "btnNewDeckNext";
             this.btnNewDeckNext.Size = new System.Drawing.Size(94, 38);
-            this.btnNewDeckNext.TabIndex = 7;
+            this.btnNewDeckNext.TabIndex = 1;
             this.btnNewDeckNext.Text = "Next";
             this.btnNewDeckNext.UseVisualStyleBackColor = true;
             this.btnNewDeckNext.Click += new System.EventHandler(this.btnNewDeckNext_Click);
@@ -288,7 +277,7 @@
             this.txtDeckName.Location = new System.Drawing.Point(126, 151);
             this.txtDeckName.Name = "txtDeckName";
             this.txtDeckName.Size = new System.Drawing.Size(250, 20);
-            this.txtDeckName.TabIndex = 6;
+            this.txtDeckName.TabIndex = 0;
             // 
             // lblDeckName
             // 
@@ -333,7 +322,7 @@
             this.btnSaveCardEdit.Location = new System.Drawing.Point(427, 388);
             this.btnSaveCardEdit.Name = "btnSaveCardEdit";
             this.btnSaveCardEdit.Size = new System.Drawing.Size(94, 38);
-            this.btnSaveCardEdit.TabIndex = 23;
+            this.btnSaveCardEdit.TabIndex = 4;
             this.btnSaveCardEdit.Text = "Save Edit";
             this.btnSaveCardEdit.UseVisualStyleBackColor = true;
             this.btnSaveCardEdit.Click += new System.EventHandler(this.btnSaveCardEdit_Click);
@@ -344,7 +333,7 @@
             this.btnSaveDeck.Location = new System.Drawing.Point(627, 388);
             this.btnSaveDeck.Name = "btnSaveDeck";
             this.btnSaveDeck.Size = new System.Drawing.Size(94, 38);
-            this.btnSaveDeck.TabIndex = 22;
+            this.btnSaveDeck.TabIndex = 5;
             this.btnSaveDeck.Text = "Finish Deck";
             this.btnSaveDeck.UseVisualStyleBackColor = true;
             this.btnSaveDeck.Click += new System.EventHandler(this.btnSaveDeck_Click);
@@ -356,7 +345,7 @@
             this.btnDeleteCard.Location = new System.Drawing.Point(327, 388);
             this.btnDeleteCard.Name = "btnDeleteCard";
             this.btnDeleteCard.Size = new System.Drawing.Size(94, 38);
-            this.btnDeleteCard.TabIndex = 21;
+            this.btnDeleteCard.TabIndex = 3;
             this.btnDeleteCard.Text = "Delete Card";
             this.btnDeleteCard.UseVisualStyleBackColor = true;
             this.btnDeleteCard.Click += new System.EventHandler(this.btnDeleteCard_Click);
@@ -376,7 +365,7 @@
             this.btnNewCardCancel.Location = new System.Drawing.Point(3, 388);
             this.btnNewCardCancel.Name = "btnNewCardCancel";
             this.btnNewCardCancel.Size = new System.Drawing.Size(94, 38);
-            this.btnNewCardCancel.TabIndex = 19;
+            this.btnNewCardCancel.TabIndex = 6;
             this.btnNewCardCancel.Text = "Cancel";
             this.btnNewCardCancel.UseVisualStyleBackColor = true;
             this.btnNewCardCancel.Click += new System.EventHandler(this.btnNewCardCancel_Click);
@@ -450,7 +439,7 @@
             this.rtbCardA.Location = new System.Drawing.Point(289, 261);
             this.rtbCardA.Name = "rtbCardA";
             this.rtbCardA.Size = new System.Drawing.Size(421, 87);
-            this.rtbCardA.TabIndex = 12;
+            this.rtbCardA.TabIndex = 1;
             this.rtbCardA.Text = "";
             // 
             // btnCardQImage
@@ -491,7 +480,7 @@
             this.rtbCardQ.Location = new System.Drawing.Point(289, 74);
             this.rtbCardQ.Name = "rtbCardQ";
             this.rtbCardQ.Size = new System.Drawing.Size(421, 87);
-            this.rtbCardQ.TabIndex = 8;
+            this.rtbCardQ.TabIndex = 0;
             this.rtbCardQ.Text = "";
             // 
             // btnNewCardSave
@@ -500,7 +489,7 @@
             this.btnNewCardSave.Location = new System.Drawing.Point(527, 388);
             this.btnNewCardSave.Name = "btnNewCardSave";
             this.btnNewCardSave.Size = new System.Drawing.Size(94, 38);
-            this.btnNewCardSave.TabIndex = 7;
+            this.btnNewCardSave.TabIndex = 2;
             this.btnNewCardSave.Text = "Create Card";
             this.btnNewCardSave.UseVisualStyleBackColor = true;
             this.btnNewCardSave.Click += new System.EventHandler(this.btnNewCardNext_Click);
@@ -557,7 +546,7 @@
             this.btnShowAnswer.Location = new System.Drawing.Point(423, 375);
             this.btnShowAnswer.Name = "btnShowAnswer";
             this.btnShowAnswer.Size = new System.Drawing.Size(94, 38);
-            this.btnShowAnswer.TabIndex = 20;
+            this.btnShowAnswer.TabIndex = 0;
             this.btnShowAnswer.Text = "Show Answer";
             this.btnShowAnswer.UseVisualStyleBackColor = true;
             this.btnShowAnswer.Click += new System.EventHandler(this.btnShowAnswer_Click);
@@ -654,6 +643,7 @@
             // 
             this.gbSkill.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSkill.Controls.Add(this.btnShowStats);
             this.gbSkill.Controls.Add(this.btnFinishDeck);
             this.gbSkill.Controls.Add(this.rb5);
             this.gbSkill.Controls.Add(this.btnCardAnswerNext);
@@ -674,7 +664,7 @@
             this.btnFinishDeck.Location = new System.Drawing.Point(395, 90);
             this.btnFinishDeck.Name = "btnFinishDeck";
             this.btnFinishDeck.Size = new System.Drawing.Size(94, 38);
-            this.btnFinishDeck.TabIndex = 22;
+            this.btnFinishDeck.TabIndex = 1;
             this.btnFinishDeck.Text = "Finish";
             this.btnFinishDeck.UseVisualStyleBackColor = true;
             this.btnFinishDeck.Click += new System.EventHandler(this.btnFinishDeck_Click);
@@ -695,7 +685,7 @@
             this.btnCardAnswerNext.Location = new System.Drawing.Point(495, 90);
             this.btnCardAnswerNext.Name = "btnCardAnswerNext";
             this.btnCardAnswerNext.Size = new System.Drawing.Size(94, 38);
-            this.btnCardAnswerNext.TabIndex = 21;
+            this.btnCardAnswerNext.TabIndex = 0;
             this.btnCardAnswerNext.Text = "Next";
             this.btnCardAnswerNext.UseVisualStyleBackColor = true;
             this.btnCardAnswerNext.Click += new System.EventHandler(this.btnCardAnswerNext_Click);
@@ -769,35 +759,46 @@
             this.resetSkillsToolStripMenuItem,
             this.deleteToolStripMenuItem});
             this.cmsTreeView.Name = "cmsTreeView";
-            this.cmsTreeView.Size = new System.Drawing.Size(153, 114);
+            this.cmsTreeView.Size = new System.Drawing.Size(132, 92);
             // 
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.viewToolStripMenuItem.Text = "View";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
             // resetSkillsToolStripMenuItem
             // 
             this.resetSkillsToolStripMenuItem.Name = "resetSkillsToolStripMenuItem";
-            this.resetSkillsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.resetSkillsToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.resetSkillsToolStripMenuItem.Text = "Reset Skills";
             this.resetSkillsToolStripMenuItem.Click += new System.EventHandler(this.resetSkillsToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // btnShowStats
+            // 
+            this.btnShowStats.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShowStats.Location = new System.Drawing.Point(295, 90);
+            this.btnShowStats.Name = "btnShowStats";
+            this.btnShowStats.Size = new System.Drawing.Size(94, 38);
+            this.btnShowStats.TabIndex = 5;
+            this.btnShowStats.Text = "Show Stats";
+            this.btnShowStats.UseVisualStyleBackColor = true;
+            this.btnShowStats.Click += new System.EventHandler(this.btnShowStats_Click);
             // 
             // frmFlashCards
             // 
@@ -886,7 +887,6 @@
         private System.Windows.Forms.ListBox lstCards;
         private System.Windows.Forms.Button btnDeleteCard;
         private System.Windows.Forms.Button btnSaveDeck;
-        private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button btnCancelNewFolder;
         private System.Windows.Forms.Button btnFinishDeck;
         private System.Windows.Forms.ContextMenuStrip cmsTreeView;
@@ -900,6 +900,7 @@
         private System.Windows.Forms.Label lblViewCardQuestion2;
         private System.Windows.Forms.Button btnSaveCardEdit;
         private System.Windows.Forms.ToolStripMenuItem resetSkillsToolStripMenuItem;
+        private System.Windows.Forms.Button btnShowStats;
     }
 }
 
