@@ -14,6 +14,17 @@ using System.IO;
 namespace FlashCards {
     public partial class frmFlashCards : Form {
 
+        public struct Folder {
+            public int ID;
+            public string name;
+        };
+
+        public struct Deck {
+            public int ID;
+            public int folderID;
+            public string name;
+        };
+
         public struct Card {
             public int ID;
             public string qText;
@@ -152,23 +163,23 @@ namespace FlashCards {
         // Open deck for viewing
         private void tvDecks_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e) {
             if (e.Node.Parent != null) {
-
-                int d = Convert.ToInt32(e.Node.Tag);
-                //viewDeck(e.Node.Text);
-                viewDeck(d);
+                int deckID = Convert.ToInt32(e.Node.Tag);
+                viewDeck(deckID);
             }
         }
 
 
         // Open deck for viewing
         private void viewToolStripMenuItem_Click(object sender, EventArgs e) {
-            //viewDeck(tvDecks.SelectedNode.Text);
+            int deckID = Convert.ToInt32(tvDecks.SelectedNode.Tag);
+            viewDeck(deckID);
         }
 
 
         // Opens deck for editing
         private void editToolStripMenuItem_Click(object sender, EventArgs e) {
-            //editDeck(tvDecks.SelectedNode.Text);
+            int deckID = Convert.ToInt32(tvDecks.SelectedNode.Tag);
+            editDeck(deckID);
         }
 
 
@@ -177,7 +188,7 @@ namespace FlashCards {
             
             if (verifyDialogue("Are you sure? All skills will be reset for this deck.")) {
                 SQLiteConnection db = openDB();
-                int deckID = getDeckID(tvDecks.SelectedNode.Text, db);
+                int deckID = Convert.ToInt32(tvDecks.SelectedNode.Tag);
                 SQLiteCommand cmd = new SQLiteCommand("UPDATE Card SET card_skill = 3 WHERE deck_id = " + deckID, db);
                 cmd.ExecuteNonQuery();
                 db.Close();
@@ -187,27 +198,9 @@ namespace FlashCards {
 
         // Deletes a deck
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e) {
-
             if (verifyDialogue("Are you sure? This deck and all cards within will be permanently deleted.")) {
-                //SQLiteConnection db = openDB();
-                //int deckID = getDeckID(tvDecks.SelectedNode.Text, db);
-
-                deleteDeck(tvDecks.SelectedNode.Text);
-                /*
-                // Delete deck
-                SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
-                delDeck.Parameters.AddWithValue("@deckIDParam", deckID);
-                delDeck.ExecuteNonQuery();
-                delDeck.Parameters.Clear();
-
-                // Delete cards
-                SQLiteCommand delCards = new SQLiteCommand("DELETE FROM Card WHERE deck_id = @deckIDParam", db);
-                delCards.Parameters.AddWithValue("@deckIDParam", deckID);
-                delCards.ExecuteNonQuery();
-                delCards.Parameters.Clear();
-                
-                db.Close();
-                */            
+                int deckID = Convert.ToInt32(tvDecks.SelectedNode.Tag);
+                deleteDeck(deckID);
                 refreshTreeView();
             }
         }
@@ -229,38 +222,18 @@ namespace FlashCards {
             // Verify folder is not in db
             SQLiteConnection db = openDB();
             string newName = txtFolderName.Text;
-            string sql = "select * from Folder where folder_name = '" + newName + "'";
-            SQLiteCommand cmd = new SQLiteCommand(sql, db);
-            SQLiteDataReader reader = cmd.ExecuteReader();
-
-            // Count # of rows
-            int i = 0;
-            while (reader.Read()) {
-                i++;
-            }
-            reader.Close();
-
-
-            // Folder name already exists
-            if (i > 0) {
+            if(getFolderID(newName, db) != -1) {
                 MessageBox.Show("Folder: '" + newName + "' already exists.");
                 return;
             }
-
+           
 
             // Add folder to database
-            sql = "insert into Folder (folder_name) values ('" + newName + "')";
-            cmd.CommandText = sql;
+            string sql = "insert into Folder (folder_name) values ('" + newName + "')";
+            SQLiteCommand cmd = new SQLiteCommand(sql, db);
             cmd.ExecuteNonQuery();
-
             db.Close();
-
-
-            // Refresh treeview on main screen
             refreshTreeView();
-
-
-            // Return to main screen
             showPanel("pnlMain");
         }
 
@@ -287,19 +260,15 @@ namespace FlashCards {
 
             // Verify deck is not in db
             SQLiteConnection db = openDB();
-            string newName = txtDeckName.Text;
-            string sql = "select * from Deck where deck_name = '" + newName + "'";
-            SQLiteCommand cmd = new SQLiteCommand(sql, db);
-            SQLiteDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows) {
+            string newName = txtFolderName.Text;
+            if (getDeckID(newName, db) != -1) {
                 MessageBox.Show("Deck: '" + newName + "' already exists.");
                 return;
             }
+            
 
-            reader.Close();
+            // Move to card creation panel
             db.Close();
-
-
             showPanel("pnlNewCard");
             cards.Clear();
             lstCards.Items.Clear();
@@ -389,21 +358,23 @@ namespace FlashCards {
             }
 
 
-            // Delete deck and cards if deck already exists
+            // Sets folder ID of deck then deletes the deck/cards (if theyexists)
             SQLiteConnection db = openDB();
-            //int deckID = getDeckID(txtDeckName.Text, db);
-            int deckID = currentDeckID;
+            int deckID = getDeckID(txtDeckName.Text, db);
             int folderID = 0;
             int deckPercent = getDeckPercentage();
-
-            if (deckID != -1) {
-                //TODO
-                // GET folder ID here and set it so that the deck will go into the correct folder again (this might not actually happen)
-                deleteDeck(txtDeckName.Text);
-            } else {
-                folderID = cbFolderName.SelectedIndex;
-            }
             
+            if (deckID != -1) {
+                folderID = getFolderID(deckID, db);
+                deleteDeck(deckID);
+            } else {
+                if (cbFolderName.SelectedIndex == 0) {
+                    folderID = -1;
+                } else {
+                    folderID = getFolderID(cbFolderName.Text, db);
+                }
+            }
+
 
             // Insert the deck
             SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Deck (deck_name, deck_percent, folder_id) VALUES (@deckNameParam,@deckPercent,@folderIDParam)", db);
@@ -508,7 +479,7 @@ namespace FlashCards {
         private void btnFinishDeck_Click(object sender, EventArgs e) {
 
             SQLiteConnection db = openDB();
-            int deckID = getDeckID(currentDeckName, db);
+            int deckID = currentDeckID;
 
 
             // Saves skill to cards list
@@ -526,9 +497,14 @@ namespace FlashCards {
 
             // Update each card's skill in db
             for (int i = 0; i < cards.Count; i++) {
-                SQLiteCommand cmd = new SQLiteCommand("UPDATE Card SET card_skill = " + cards[i].skill + " WHERE deck_id = " + deckID, db);
+                SQLiteCommand cmd = new SQLiteCommand("UPDATE Card SET card_skill = " + cards[i].skill + " WHERE card_id = " + cards[i].ID, db);
                 cmd.ExecuteNonQuery();
             }
+
+
+            // Update the deck's overall skill percent
+            SQLiteCommand cmdDeck = new SQLiteCommand("UPDATE Deck SET deck_percent = " + getDeckPercentage() + " WHERE deck_id = " + deckID, db);
+            cmdDeck.ExecuteNonQuery();
 
 
             // Return to main screen
@@ -609,8 +585,10 @@ namespace FlashCards {
 
         // Refreshes the folders/decks/cards on the main panel
         private void refreshTreeView() {
-            SQLiteConnection db = openDB();
 
+            List<Folder> folders = new List<Folder>();
+            List<Deck> decks = new List<Deck>();
+            SQLiteConnection db = openDB();
             tvDecks.Nodes.Clear();
             
             
@@ -619,40 +597,46 @@ namespace FlashCards {
             SQLiteCommand cmd = new SQLiteCommand(sql, db);
             SQLiteDataReader reader = cmd.ExecuteReader();
 
+            Folder f = new Folder();
+            f.ID = -1;
+            f.name = "- No Folder -";
+            folders.Add(f);
+
             while (reader.Read()) {
-                tvDecks.Nodes.Add(Convert.ToString(reader["folder_name"]));
+                f = new Folder();
+                f.ID = Convert.ToInt32(reader["folder_id"]);
+                f.name = Convert.ToString(reader["folder_name"]);
+                folders.Add(f);
             }
             reader.Close();
-
-
-            // Folder for decks without a folder
-            tvDecks.Nodes.Add("- No Folder -");
 
 
             // Get decks
             sql = "select * from Deck";
             cmd = new SQLiteCommand(sql, db);
             reader = cmd.ExecuteReader();
-
-            int deckIndex = 0;
+            
             while (reader.Read()) {
-                // Add each deck to the right folder
-                int parentIndex = Convert.ToInt32(reader["folder_id"]) - 1;
-                string deckName = Convert.ToString(reader["deck_name"]) + " (" + Convert.ToString(reader["deck_percent"]) + "%)";
-                int ID = Convert.ToInt32(reader["deck_id"]);
+                Deck d = new Deck();
+                d.name = Convert.ToString(reader["deck_name"]) + " (" + Convert.ToString(reader["deck_percent"]) + "%)";
+                d.folderID = Convert.ToInt32(reader["folder_id"]);
+                d.ID = Convert.ToInt32(reader["deck_id"]);
+                decks.Add(d);
+            }
 
-                // Check if deck has folder
-                if (parentIndex == -1) {
-                    tvDecks.Nodes[tvDecks.Nodes.Count - 1].Nodes.Add(deckName);
-                    tvDecks.Nodes[tvDecks.Nodes.Count - 1].Nodes[deckIndex].Tag = ID;
-                }
-                else {
-                    tvDecks.Nodes[parentIndex].Nodes.Add(deckName);
-                    tvDecks.Nodes[parentIndex].Nodes[deckIndex].Tag = ID;
-                }
 
-                // Set the deck's tag as its ID
-                
+            // Add folders
+            for(int i = 0; i < folders.Count; i++) {
+                tvDecks.Nodes.Add(folders[i].name);
+
+                // Add decks
+                int deckIndex = 0;
+                for (int j = 0; j < decks.Count; j++) {
+                    if(decks[j].folderID == folders[i].ID) {
+                        tvDecks.Nodes[i].Nodes.Add(decks[j].name);
+                        tvDecks.Nodes[i].Nodes[deckIndex++].Tag = decks[j].ID;
+                    }
+                }
             }
 
             reader.Close();
@@ -763,29 +747,11 @@ namespace FlashCards {
             
             if (tvDecks.SelectedNode.Parent != null) {
 
-                cards.Clear();
-                //currentDeckName = deckName;
-                currentDeckID = deckID;
-
-
-                // Get cards
+                // Set variable and load cards
                 SQLiteConnection db = openDB();
-                //int deckID = getDeckID(deckName, db);
-                string sql = "select * from Card where deck_id = " + deckID;
-                SQLiteCommand cmd = new SQLiteCommand(sql, db);
-                SQLiteDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read()) {
-                    Card c = new Card();
-                    c.qText = reader["card_q_text"].ToString();
-                    c.qImage = reader["card_q_image"].ToString();
-                    c.aText = reader["card_a_text"].ToString();
-                    c.aImage = reader["card_a_image"].ToString();
-                    c.skill = Convert.ToInt32(reader["card_skill"]);
-
-                    cards.Add(c);
-                }
-                reader.Close();
+                currentDeckName = getDeckName(deckID, db);
+                currentDeckID = deckID;
+                loadCards(deckID, db);
                 db.Close();
 
 
@@ -809,34 +775,16 @@ namespace FlashCards {
 
             if (tvDecks.SelectedNode.Parent != null) {
 
-                currentDeckID = deckID;
-                // Gather cards from db
-                cards.Clear();
-
+                // Set variables and load cards
                 SQLiteConnection db = openDB();
-                //int deckID = getDeckID(deckName, db);
-                string sql = "select * from Card where deck_id = " + deckID;
-                SQLiteCommand cmd = new SQLiteCommand(sql, db);
-                SQLiteDataReader reader = cmd.ExecuteReader();
-
-                int counter = 0;
-                while (reader.Read()) {
-                    Card c = new Card();
-                    c.ID = counter++;
-                    c.qText = reader["card_q_text"].ToString();
-                    c.qImage = reader["card_q_image"].ToString();
-                    c.aText = reader["card_a_text"].ToString();
-                    c.aImage = reader["card_a_image"].ToString();
-                    c.skill = Convert.ToInt32(reader["card_skill"]);
-
-                    cards.Add(c);
-                }
-                reader.Close();
+                currentDeckID = deckID;
+                currentDeckName = getDeckName(deckID, db);
+                loadCards(deckID, db);
                 db.Close();
 
 
                 // Get panel ready for editing
-                //txtDeckName.Text = deckName;
+                txtDeckName.Text = currentDeckName;
                 refreshCardsListBox();
                 showPanel("pnlNewCard");
             }
@@ -844,9 +792,9 @@ namespace FlashCards {
 
 
         // Deletes a deck and all of its cards
-        private void deleteDeck(string deckName) {
+        //private void deleteDeck(string deckName) {
+        private void deleteDeck(int deckID) {
             SQLiteConnection db = openDB();
-            int deckID = getDeckID(deckName, db);
 
             // Delete deck
             SQLiteCommand delDeck = new SQLiteCommand("DELETE FROM Deck WHERE deck_id = @deckIDParam", db);
@@ -859,6 +807,30 @@ namespace FlashCards {
             delCards.Parameters.AddWithValue("@deckIDParam", deckID);
             delCards.ExecuteNonQuery();
             delCards.Parameters.Clear();
+        }
+
+
+        // Loads cards from db into the cards list
+        private void loadCards(int deckID, SQLiteConnection db) {
+
+            string sql = "select * from Card where deck_id = " + deckID;
+            SQLiteCommand cmd = new SQLiteCommand(sql, db);
+            SQLiteDataReader reader = cmd.ExecuteReader();
+
+            cards.Clear();
+            int counter = 0;
+            while (reader.Read()) {
+                Card c = new Card();
+                c.ID = Convert.ToInt32(reader["card_id"]);
+                c.qText = reader["card_q_text"].ToString();
+                c.qImage = reader["card_q_image"].ToString();
+                c.aText = reader["card_a_text"].ToString();
+                c.aImage = reader["card_a_image"].ToString();
+                c.skill = Convert.ToInt32(reader["card_skill"]);
+
+                cards.Add(c);
+            }
+            reader.Close();
         }
 
 
@@ -909,9 +881,9 @@ namespace FlashCards {
 
 
         // Returns the ID of the folder that a deck belongs to
-        private int getFolderID(string deckName, SQLiteConnection db) {
-
-            string sql = "select * from Deck where deck_name = '" + deckName + "'";
+        //private int getFolderID(string deckName, SQLiteConnection db) {
+        private int getFolderID(int deckID, SQLiteConnection db) {
+            string sql = "select * from Deck where deck_id = '" + deckID + "'";
             SQLiteCommand cmd = new SQLiteCommand(sql, db);
             SQLiteDataReader reader = cmd.ExecuteReader();
             reader.Read();
@@ -931,6 +903,30 @@ namespace FlashCards {
             return folderID;
         }
 
+
+        // Returns the ID of the folder with a given folder name (-1 if no folder exists)
+        private int getFolderID(string folderName, SQLiteConnection db) {
+
+            string sql = "select * from Folder where folder_name = '" + folderName + "'";
+            SQLiteCommand cmd = new SQLiteCommand(sql, db);
+            SQLiteDataReader reader = cmd.ExecuteReader();
+
+            reader.Read();
+            int folderID = 0;
+
+            try {
+                folderID = Convert.ToInt32(reader["folder_id"]);
+            }
+            catch (Exception e) {
+                MessageBox.Show("No such folder");
+                folderID = -1;
+            }
+            finally {
+                reader.Close();
+            }
+
+            return folderID;
+        } 
 
         #endregion
 
