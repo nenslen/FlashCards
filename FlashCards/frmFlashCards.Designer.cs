@@ -74,6 +74,7 @@
             this.rtbViewCardAnswer = new System.Windows.Forms.RichTextBox();
             this.rtbViewCardQuestion = new System.Windows.Forms.RichTextBox();
             this.gbSkill = new System.Windows.Forms.GroupBox();
+            this.btnShowStats = new System.Windows.Forms.Button();
             this.btnFinishDeck = new System.Windows.Forms.Button();
             this.rb5 = new System.Windows.Forms.RadioButton();
             this.btnCardAnswerNext = new System.Windows.Forms.Button();
@@ -88,7 +89,14 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetSkillsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnShowStats = new System.Windows.Forms.Button();
+            this.pnlStats = new System.Windows.Forms.Panel();
+            this.btnStatsBack = new System.Windows.Forms.Button();
+            this.dgvSkills = new System.Windows.Forms.DataGridView();
+            this.colSkill = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPercent = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.lblTotalCards = new System.Windows.Forms.Label();
+            this.lblStatsDeckName = new System.Windows.Forms.Label();
             this.pnlMain.SuspendLayout();
             this.pnlNewFolder.SuspendLayout();
             this.pnlNewDeck.SuspendLayout();
@@ -99,6 +107,8 @@
             this.gbSkill.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).BeginInit();
             this.cmsTreeView.SuspendLayout();
+            this.pnlStats.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSkills)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlMain
@@ -658,6 +668,17 @@
             this.gbSkill.TabStop = false;
             this.gbSkill.Text = "How well did you do?";
             // 
+            // btnShowStats
+            // 
+            this.btnShowStats.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShowStats.Location = new System.Drawing.Point(295, 90);
+            this.btnShowStats.Name = "btnShowStats";
+            this.btnShowStats.Size = new System.Drawing.Size(94, 38);
+            this.btnShowStats.TabIndex = 5;
+            this.btnShowStats.Text = "Show Stats";
+            this.btnShowStats.UseVisualStyleBackColor = true;
+            this.btnShowStats.Click += new System.EventHandler(this.btnShowStats_Click);
+            // 
             // btnFinishDeck
             // 
             this.btnFinishDeck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -789,22 +810,86 @@
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
-            // btnShowStats
+            // pnlStats
             // 
-            this.btnShowStats.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnShowStats.Location = new System.Drawing.Point(295, 90);
-            this.btnShowStats.Name = "btnShowStats";
-            this.btnShowStats.Size = new System.Drawing.Size(94, 38);
-            this.btnShowStats.TabIndex = 5;
-            this.btnShowStats.Text = "Show Stats";
-            this.btnShowStats.UseVisualStyleBackColor = true;
-            this.btnShowStats.Click += new System.EventHandler(this.btnShowStats_Click);
+            this.pnlStats.Controls.Add(this.btnStatsBack);
+            this.pnlStats.Controls.Add(this.dgvSkills);
+            this.pnlStats.Controls.Add(this.lblTotalCards);
+            this.pnlStats.Controls.Add(this.lblStatsDeckName);
+            this.pnlStats.Location = new System.Drawing.Point(627, 355);
+            this.pnlStats.Name = "pnlStats";
+            this.pnlStats.Size = new System.Drawing.Size(468, 465);
+            this.pnlStats.TabIndex = 22;
+            // 
+            // btnStatsBack
+            // 
+            this.btnStatsBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStatsBack.Location = new System.Drawing.Point(371, 423);
+            this.btnStatsBack.Name = "btnStatsBack";
+            this.btnStatsBack.Size = new System.Drawing.Size(94, 38);
+            this.btnStatsBack.TabIndex = 21;
+            this.btnStatsBack.Text = "Back";
+            this.btnStatsBack.UseVisualStyleBackColor = true;
+            this.btnStatsBack.Click += new System.EventHandler(this.btnStatsBack_Click);
+            // 
+            // dgvSkills
+            // 
+            this.dgvSkills.AllowUserToAddRows = false;
+            this.dgvSkills.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.dgvSkills.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvSkills.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvSkills.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colSkill,
+            this.colAmount,
+            this.colPercent});
+            this.dgvSkills.Location = new System.Drawing.Point(99, 72);
+            this.dgvSkills.Name = "dgvSkills";
+            this.dgvSkills.RowHeadersVisible = false;
+            this.dgvSkills.Size = new System.Drawing.Size(287, 150);
+            this.dgvSkills.TabIndex = 27;
+            // 
+            // colSkill
+            // 
+            this.colSkill.HeaderText = "Skill";
+            this.colSkill.Name = "colSkill";
+            // 
+            // colAmount
+            // 
+            this.colAmount.HeaderText = "# of Cards";
+            this.colAmount.Name = "colAmount";
+            // 
+            // colPercent
+            // 
+            this.colPercent.HeaderText = "Percentage Complete";
+            this.colPercent.Name = "colPercent";
+            // 
+            // lblTotalCards
+            // 
+            this.lblTotalCards.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblTotalCards.AutoSize = true;
+            this.lblTotalCards.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTotalCards.Location = new System.Drawing.Point(96, 49);
+            this.lblTotalCards.Name = "lblTotalCards";
+            this.lblTotalCards.Size = new System.Drawing.Size(101, 18);
+            this.lblTotalCards.TabIndex = 25;
+            this.lblTotalCards.Text = "Total Cards: 0";
+            // 
+            // lblStatsDeckName
+            // 
+            this.lblStatsDeckName.AutoSize = true;
+            this.lblStatsDeckName.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblStatsDeckName.Location = new System.Drawing.Point(3, 3);
+            this.lblStatsDeckName.Name = "lblStatsDeckName";
+            this.lblStatsDeckName.Size = new System.Drawing.Size(187, 25);
+            this.lblStatsDeckName.TabIndex = 25;
+            this.lblStatsDeckName.Text = "Deck_Name_Here";
             // 
             // frmFlashCards
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2855, 1062);
+            this.Controls.Add(this.pnlStats);
             this.Controls.Add(this.pnlCardAnswer);
             this.Controls.Add(this.pnlCardQuestion);
             this.Controls.Add(this.pnlNewCard);
@@ -830,6 +915,9 @@
             this.gbSkill.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbCardAnswer)).EndInit();
             this.cmsTreeView.ResumeLayout(false);
+            this.pnlStats.ResumeLayout(false);
+            this.pnlStats.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSkills)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -901,6 +989,14 @@
         private System.Windows.Forms.Button btnSaveCardEdit;
         private System.Windows.Forms.ToolStripMenuItem resetSkillsToolStripMenuItem;
         private System.Windows.Forms.Button btnShowStats;
+        private System.Windows.Forms.Panel pnlStats;
+        private System.Windows.Forms.DataGridView dgvSkills;
+        private System.Windows.Forms.Label lblTotalCards;
+        private System.Windows.Forms.Label lblStatsDeckName;
+        private System.Windows.Forms.Button btnStatsBack;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSkill;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAmount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPercent;
     }
 }
 

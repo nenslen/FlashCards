@@ -50,7 +50,17 @@ namespace FlashCards {
         /*
          * TODO
          * 
-         * Add stats to answer slide
+         * Separate panel for stats with a return button
+         *  -Pie chart for levels of skill
+         * 
+         * 
+         * Right click and delete folders
+         * 
+         * Delete folders (and all decks within)
+         * 
+         * Rename folder/deck
+         * 
+         * List of cards for 
          */
 
 
@@ -397,18 +407,19 @@ namespace FlashCards {
 
             // Insert each card
             deckID = getDeckID(txtDeckName.Text, db);
-
-            for (int i = 0; i < cards.Count; i++) {
+        
+            foreach(Card c in cards) {
                 SQLiteCommand insertSQL = new SQLiteCommand("INSERT INTO Card (card_q_text, card_q_image, card_a_text, card_a_image, card_skill, deck_id) " +
                                                             "VALUES (@qTextParam,@qImageParam,@aTextParam,@aImageParam,@skillParam,@deckIDParam)", db);
-                insertSQL.Parameters.AddWithValue("@qTextParam", cards[i].qText);
-                insertSQL.Parameters.AddWithValue("@qImageParam", cards[i].qImage);
-                insertSQL.Parameters.AddWithValue("@aTextParam", cards[i].aText);
-                insertSQL.Parameters.AddWithValue("@aImageParam", cards[i].aImage);
-                insertSQL.Parameters.AddWithValue("@skillParam", cards[i].skill);
+                insertSQL.Parameters.AddWithValue("@qTextParam", c.qText);
+                insertSQL.Parameters.AddWithValue("@qImageParam", c.qImage);
+                insertSQL.Parameters.AddWithValue("@aTextParam", c.aText);
+                insertSQL.Parameters.AddWithValue("@aImageParam", c.aImage);
+                insertSQL.Parameters.AddWithValue("@skillParam", c.skill);
                 insertSQL.Parameters.AddWithValue("@deckIDParam", deckID);
                 insertSQL.ExecuteNonQuery();
             }
+            
 
             db.Close();
             refreshTreeView();
@@ -455,6 +466,15 @@ namespace FlashCards {
         // Shows answer to card question
         private void btnShowAnswer_Click(object sender, EventArgs e) {
             showCardAnswer(cardIndex);
+            showPanel("pnlCardAnswer");
+        }
+
+        #endregion
+
+        #region Stats Panel
+
+        // Return to the card viewing panel
+        private void btnStatsBack_Click(object sender, EventArgs e) {
             showPanel("pnlCardAnswer");
         }
 
@@ -527,23 +547,48 @@ namespace FlashCards {
         // Shows stats for current deck
         private void btnShowStats_Click(object sender, EventArgs e) {
             
+            // Get skills
             int[] skills = new int[5];
             double total = 0;
-
             foreach (Card c in cards) {
                 skills[c.skill - 1]++;
                 total++;
             }
 
 
-            string message = "Total Cards: " + total     + "\n" +
-                             "Perfect: "     + skills[4] + " (" + (skills[4] / total) * 100 + "%)\n" +
-                             "Good: "        + skills[3] + " (" + (skills[3] / total) *100 + "%)\n" +
-                             "Neutral: "     + skills[2] + " (" + (skills[2] / total) *100 + "%)\n" +
-                             "Not great: "   + skills[1] + " (" + (skills[1] / total) *100 + "%)\n" +
-                             "Very Bad: "    + skills[0] + " (" + (skills[0] / total) *100 + "%)\n";
+            lblTotalCards.Text = "Total Cards: " + total;
 
-            MessageBox.Show(message);
+
+            // Fill dgv with skills
+            dgvSkills.Rows.Clear();
+            dgvSkills.Rows.Add();
+            dgvSkills.Rows[0].Cells[0].Value = "Perfect";
+            dgvSkills.Rows[0].Cells[1].Value = skills[4];
+            dgvSkills.Rows[0].Cells[2].Value = Convert.ToInt32((skills[4] / total) * 100) + "%";
+            dgvSkills.Rows.Add();
+
+            dgvSkills.Rows[1].Cells[0].Value = "Good";
+            dgvSkills.Rows[1].Cells[1].Value = skills[3];
+            dgvSkills.Rows[1].Cells[2].Value = Convert.ToInt32((skills[3] / total) * 100) + "%";
+            dgvSkills.Rows.Add();
+
+            dgvSkills.Rows[2].Cells[0].Value = "Neutral";
+            dgvSkills.Rows[2].Cells[1].Value = skills[2];
+            dgvSkills.Rows[2].Cells[2].Value = Convert.ToInt32((skills[2] / total) * 100) + "%";
+            dgvSkills.Rows.Add();
+
+            dgvSkills.Rows[3].Cells[0].Value = "Not Great";
+            dgvSkills.Rows[3].Cells[1].Value = skills[1];
+            dgvSkills.Rows[3].Cells[2].Value = Convert.ToInt32((skills[1] / total) * 100) + "%";
+            dgvSkills.Rows.Add();
+
+            dgvSkills.Rows[4].Cells[0].Value = "Very Bad";
+            dgvSkills.Rows[4].Cells[1].Value = skills[0];
+            dgvSkills.Rows[4].Cells[2].Value = Convert.ToInt32((skills[0] / total) * 100) + "%";
+
+            lblStatsDeckName.Text = "Stats for Deck: " + currentDeckName;
+            showPanel("pnlStats");
+            //MessageBox.Show(message);
         }
 
         #endregion
@@ -573,12 +618,13 @@ namespace FlashCards {
 
             lstCards.Items.Clear();
 
-            for(int i = 0; i < cards.Count(); i++) {
-                string description = cards[i].qText;
-                if (description.Length > 35) {
-                    description = description.Substring(0, 35) + "...";
+            int count = 1;
+            foreach(Card c in cards) {
+                string description = c.qText;
+                if(c.qText.Length > 35) {
+                    description = c.qText.Substring(0, 35) + "...";
                 }
-                lstCards.Items.Add(Convert.ToString(i + 1) + ") " + description);
+                lstCards.Items.Add(Convert.ToString(count++) + ") " + description);
             }
         }
 
@@ -642,7 +688,7 @@ namespace FlashCards {
                 folders.Add(f);
             }
             reader.Close();
-
+            
 
             // Get decks
             sql = "select * from Deck";
@@ -656,9 +702,9 @@ namespace FlashCards {
                 d.ID = Convert.ToInt32(reader["deck_id"]);
                 decks.Add(d);
             }
+            
 
-
-            // Add folders
+            // Add Folders
             for(int i = 0; i < folders.Count; i++) {
                 tvDecks.Nodes.Add(folders[i].name);
 
@@ -671,6 +717,8 @@ namespace FlashCards {
                     }
                 }
             }
+            
+
 
             reader.Close();
             db.Close();
@@ -958,6 +1006,7 @@ namespace FlashCards {
 
             return folderID;
         }
+
 
 
         #endregion
